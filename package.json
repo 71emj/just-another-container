@@ -1,0 +1,29 @@
+{
+  "name": "just_another_ioc_container",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress --display-error-details"
+  },
+  "author": "71emj, Timothy Jeng <tim.jeng@gmail.com>",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/jquery": "^3.3.11",
+    "@types/node": "^10.11.4",
+    "@types/webpack": "^4.4.16",
+    "html-loader": "^0.5.5",
+    "jquery": "^3.3.1",
+    "ts-loader": "^5.2.1",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.1",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.12"
+  }
+}

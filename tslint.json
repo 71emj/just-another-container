@@ -1,0 +1,38 @@
+{
+    "rules": {
+        "no-angle-bracket-type-assertion": false,
+        "object-literal-sort-keys": false,
+        "trailing-comma": false,
+        "array-type": [
+            true,
+            "generic"
+        ],
+        "indent": [
+            true, 
+            "spaces",
+            4
+        ],
+        "interface-name": [
+            true, 
+            "never-prefix"
+        ],
+        "member-access": [
+            true,
+            "check-accessor",
+            "check-constructor",
+            "check-parameter-property"
+        ],
+        "quotemark": [
+            true, 
+            "single", 
+            "avoid-escape", 
+            "avoid-template"
+        ],
+    },
+    "rulesDirectory": [],
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {}
+}
