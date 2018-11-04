@@ -10,8 +10,9 @@ export function Module(options: ApplicationOption): ClassDecorator {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, MAIN);
         if (!descriptor || 'function' !== typeof(descriptor.value)) {
             console.warn(''
-                + `Static method "main" was not found on ${target.name}.class. `
-                + `Classes decorated with @Module are recommended to main to class entry to avoid accidental override.`
+                + `Static method "main" was not found in [${target.name}.class]. `
+                + `Classes decorated with @Module are recommended to define a staic main method `
+                + `in class entry to avoid accidental override.`
             );
             Reflect.defineProperty(target, MAIN, {
                 configurable: false,
@@ -30,12 +31,13 @@ export function Module(options: ApplicationOption): ClassDecorator {
 }
 
 function createBean<T extends Function>(bean: T): T {
-    console.debug(`Creating bean: ${bean.name}`);
+    console.debug(`Creating bean: [${bean.name}]`);
     let beanInstance;
     try {
         beanInstance = Reflect.construct(bean, []);
     } catch (err) {
         console.error(err);
+        console.error(`Error creating bean [${bean.name}]`);
     }
     console.debug(`${bean.name} created.`);
     return beanInstance;

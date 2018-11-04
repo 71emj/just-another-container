@@ -31,8 +31,7 @@ function wiredByPropertyName(target: object, propertyKey: string | symbol): void
             const service = Container.getRegisteredBean(name);
             if (!service) {
                 throw new NoBeanDefinitionException(''
-                    + `There's no Bean with name: ${name} `
-                    + `define in application.`
+                    + `There's no Bean with name: [${name}] registered in BeanContainer.`
                 );
             }
             Object.defineProperty(this, propertyKey, {
@@ -52,8 +51,7 @@ function wiredByExplicitName(name: string): PropertyDecorator {
                 const service = Container.getRegisteredBean(name);
                 if (!service) {
                     throw new NoBeanDefinitionException(''
-                        + `There's no Bean with name: ${name}`
-                        + `define in application.`
+                        + `There's no Bean with name: [${name}] registered in BeanContainer.`
                     );
                 }
                 Object.defineProperty(this, propertyKey, {

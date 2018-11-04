@@ -24,7 +24,7 @@ export function ViewChild(selector: string, type: ViewElementRef = 'html'): Prop
             get() {
                 viewComponent = viewComponent || viewSelector(selector);
                 if (!viewComponent) {
-                    throw new NoViewChildException(`Element with id: "${selector}" is not visible in current view.`);
+                    throw new NoViewChildException(`Element with id: [${selector}] is not visible in current view.`);
                 }
                 Object.defineProperty(this, propertyKey, {
                     value: viewComponent,
