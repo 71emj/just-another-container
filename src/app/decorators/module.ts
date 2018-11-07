@@ -1,9 +1,11 @@
-import { BeanContainer } from "./bean-container";
+import { BeanContainer, Bean } from "./bean-container";
+import { BEAN, AUTOWIRED } from "./metadata-symbols";
 
 export interface ApplicationOption {
     declarations: Array<Function>;
 }
 const MAIN = 'main';
+const Container = BeanContainer.getInstance();
 
 export function Module(options: ApplicationOption): ClassDecorator {
     return <T extends Function>(target: T) => {
@@ -24,30 +26,28 @@ export function Module(options: ApplicationOption): ClassDecorator {
         documentReady().then(() => {
             main();
             options.declarations.map(createBean);
-            initiateActiveControllers();
         });
         return target;
     }
 }
 
-function createBean<T extends Function>(bean: T): T {
+function createBean<T extends Function>(bean: T): Bean | undefined {
     console.debug(`Creating bean: [${bean.name}]`);
-    let beanInstance;
+    console.log(bean);
+    let beanMetadata;
     try {
-        beanInstance = Reflect.construct(bean, []);
+        beanMetadata = <Bean> Reflect.getMetadata(BEAN, bean);
+        console.log(Reflect.getMetadataKeys(bean));
+        if (!Container.has(bean)) {
+            console.warn("REGISTER BEAN");
+            Container.registerBean(bean, Container.createBean(bean));
+        }
     } catch (err) {
         console.error(err);
         console.error(`Error creating bean [${bean.name}]`);
     }
     console.debug(`${bean.name} created.`);
-    return beanInstance;
-}
-
-function initiateActiveControllers() {
-    const activeControllers = BeanContainer.getInstance().getActiveControllers();
-    if (activeControllers) {
-        activeControllers.forEach(bindingFunction => bindingFunction());
-    }
+    return beanMetadata || undefined;
 }
 
 function documentReady() {

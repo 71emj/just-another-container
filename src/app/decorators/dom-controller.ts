@@ -1,4 +1,6 @@
 import { BeanContainer } from "./bean-container";
+import { Component } from "./service-injector";
+import { BEAN } from "./metadata-symbols";
 
 const Container = BeanContainer.getInstance();
 const BIND_CONTROLLERS = 'bindControllers';
@@ -30,17 +32,21 @@ export function DomController(options: ControllerOption): ClassDecorator {
                 + `it is highly recommended to implement "DomBindable" interface for controller class.`
             );
         }
+        Reflect.decorate([Component(options.name)], target);
         const instance = Reflect.construct(target, []);
+        Reflect.hasMetadata(BEAN, instance);
         if (urlLocation === options.url) {
-            Container.registerActiveControllers(() => {
-                instance.bindControllers()
-                Reflect.defineProperty(target.prototype, BIND_CONTROLLERS, {
-                    configurable: false,
-                    value: () => console.warn(''
-                        + `Controller binding has already been activated in current url location: <${urlLocation}>. `
-                        + `Modified @DomController mapping if this is a mistake.`
-                    )
-                });
+            Reflect.defineProperty(target.prototype, BIND_CONTROLLERS, {
+                get(this) {
+                    Reflect.defineProperty(this, BIND_CONTROLLERS, {
+                        configurable: false,
+                        value: () => console.warn(''
+                            + `Controller binding has already been activated in current url location: <${urlLocation}>. `
+                            + `Modified @DomController mapping if this is a mistake.`
+                        )
+                    });
+                    return instance.bindControllers;
+                }
             });
         } else {
             Reflect.defineProperty(target.prototype, BIND_CONTROLLERS, {
@@ -51,7 +57,6 @@ export function DomController(options: ControllerOption): ClassDecorator {
                 )
             });
         }
-        Container.registerBean(options.name, instance);
         return target;
     }
 }

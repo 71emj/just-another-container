@@ -1,4 +1,5 @@
 import { Service, Bind } from "../decorators";
+import { Page1Controller } from "../controllers/page-1-controller";
 
 @Service('navigation')
 export class NavigationService {

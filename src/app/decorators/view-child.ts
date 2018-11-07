@@ -1,3 +1,5 @@
+import { DESIGNTYPE } from "./metadata-symbols";
+
 export interface ViewSelectorOptions {
     // alias for selector
     name?: string;
@@ -26,10 +28,9 @@ export function ViewChild(selector: string, type: ViewElementRef = 'html'): Prop
                 if (!viewComponent) {
                     throw new NoViewChildException(`Element with id: [${selector}] is not visible in current view.`);
                 }
-                Object.defineProperty(this, propertyKey, {
-                    value: viewComponent,
-                });
-                return 'html' !== type ? $(viewComponent) : viewComponent;
+                const value = 'html' !== type ? $(viewComponent) : viewComponent;
+                Object.defineProperty(this, propertyKey, { value });
+                return value;
             }
         });
     }
@@ -38,4 +39,25 @@ export function ViewChild(selector: string, type: ViewElementRef = 'html'): Prop
 function viewSelector(selector: string): HTMLElement | null {
     const viewComponent = document.getElementById(selector);
     return viewComponent;
+}
+
+
+type Comparable = number | string | Function | Object | object;
+
+function is(a: number, b: number): boolean;
+function is(a: string, b: string): boolean;
+function is(a: Function, b: Function): boolean;
+function is(a: Object, b: Object): boolean;
+function is(a: object, b: object): boolean;
+function is(a: Comparable, b: Comparable): boolean {
+    if (a === b) {
+        return true;
+    }
+    if (Object.is(a, b)) {
+        return true;
+    }
+    if (JSON.stringify(a) === JSON.stringify(b)) {
+        return true;
+    }
+    return false;
 }

@@ -1,12 +1,20 @@
-type Bean = Function | object;
+import { DESIGNTYPE, PARAMTYPES } from "./metadata-symbols";
 
-export class BeanContainer {
+export type Bean = Function | object;
+
+export class BeanContainer { // should have container holding metadatas
 
     private static containerInstance: BeanContainer;
-    private _components: Map<string, Bean>;
-    private _controllers: Set<Function>;
+    private _components: WeakMap<Bean, Bean>;
 
     private constructor() {}
+
+    get components() {
+        if (!this._components) {
+            this._components = new WeakMap();
+        }
+        return this._components;
+    }
 
     static getInstance(): BeanContainer {
         if (!this.containerInstance) {
@@ -15,26 +23,32 @@ export class BeanContainer {
         return this.containerInstance;
     }
 
-    public registerBean(entry: string, bean: Bean): void {
-        if (!this._components) {
-            this._components = new Map();
+    // should throw error if intantiation failed
+    public getRegisteredBean(entry: Bean): Bean {
+        if (!this.has(entry)) {
+            return this.createBean(entry);
+        } else {
+            return this.components.get(entry)!;
         }
-        this._components.set(entry, bean);
     }
 
-    public getRegisteredBean(entry: string): Bean | null {
-        return this._components.get(entry) || null;
+    public registerBean(entry: Bean, bean: Bean): void {
+        this.components.set(entry, bean);
     }
 
-    public registerActiveControllers(callback: Function): void {
-        if (!this._controllers) {
-            this._controllers = new Set();
+    // need to test edge cases on non constructable dependencies
+    public createBean(entry: Bean): Bean {
+        let metadatas: Array<Bean> = Reflect.getMetadata(PARAMTYPES, entry) || [];
+        if (metadatas.length) {
+            metadatas = metadatas.map(
+                dependent => this.getRegisteredBean(dependent));
         }
-        this._controllers.add(callback);
+        this.registerBean(entry, Reflect.construct(<Function> entry, metadatas));
+        return this.getRegisteredBean(entry);
     }
 
-    public getActiveControllers() {
-        return this._controllers;
+    public has(entry: Bean): boolean {
+        return this.components.has(entry);
     }
 
 }
