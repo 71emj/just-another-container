@@ -10,7 +10,7 @@ export class Page1Controller implements DomBindable {
 
     @ViewChild('submit') protected _submit: HTMLElement;
     @ViewChild('form') protected _form: HTMLFormElement;
-    @Autowired('navigation') private _navigator: NavigationService;
+    @Autowired private _navigator: NavigationService;
 
     public bindControllers(): void {
         this._submit.addEventListener(CLICK, this._submitAndNavigate);

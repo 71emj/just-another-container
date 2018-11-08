@@ -1,7 +1,7 @@
 import { CLICK } from '../constants/events';
 import { NavigationService } from '../navigation/navigation-service';
 import { ViewChild, Component, Bind, Autowired, NoViewChildException, DomController, DomBindable } from '../decorators';
-import { BEAN, AUTOWIRED } from '../decorators/metadata-symbols';
+import { BEAN, AUTOWIRED, DESIGNTYPE } from '../decorators/metadata-symbols';
 
 @DomController({ 
     name: 'page2Controller', 
@@ -9,19 +9,21 @@ import { BEAN, AUTOWIRED } from '../decorators/metadata-symbols';
 })
 export class Page2Controller implements DomBindable {
 
-    @ViewChild('previous') protected _previousButton: HTMLElement;
-    @ViewChild('next') protected _nextButton: HTMLElement;
-    @Autowired private _navigator: NavigationService;
+    @ViewChild('previous', 'jquery') protected _previousButton: JQuery;
+    @ViewChild('next') protected _nextButton: HTMLInputElement;
+    @Autowired private navigation: NavigationService;
 
     constructor(
-        private nav: NavigationService
+        private _navigator: NavigationService
     ) {}
 
     public bindControllers(): void {
-        this._previousButton.addEventListener(CLICK, this._navigate);
+        this._previousButton.on(CLICK, this._navigate);
         this._nextButton.addEventListener(CLICK, this._navigate);
+        console.log(Reflect.getMetadata(DESIGNTYPE, this, '_previousButton'));
+        console.log(Reflect.getMetadata(DESIGNTYPE, this, '_nextButton'));
         console.log(Reflect.getMetadata(BEAN, this));
-        console.log(Reflect.getMetadata(AUTOWIRED, this, '_navigator'));
+        console.log(Reflect.getMetadataKeys(this));
     }
 
     @Bind

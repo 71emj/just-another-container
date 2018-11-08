@@ -1,7 +1,7 @@
 import { Service, Bind } from "../decorators";
 import { Page1Controller } from "../controllers/page-1-controller";
 
-@Service('navigation')
+@Service()
 export class NavigationService {
 
     private readonly PREVIOUS = "previous";
@@ -10,6 +10,8 @@ export class NavigationService {
     private _session: Storage = window.sessionStorage;
     private _history: History = window.history;
     private _routeHistory: Array<UrlHistory> = [];
+
+    constructor() {}
 
     get previousPage() {
         const previous = this._session.getItem(this.PREVIOUS);

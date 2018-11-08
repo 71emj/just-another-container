@@ -1,51 +1,51 @@
 import 'reflect-metadata';
-import { BeanContainer, Bean } from "./bean-container";
+import { Bean } from "./bean-container";
 import { BEAN, PARAMTYPES, CLASSTYPE } from './metadata-symbols';
-import { Autowired } from './service-autowired';
+import { Scope } from './singleton';
 
-const Container = BeanContainer.getInstance();
-
-export function Service(name: string): ClassDecorator {
-    return Component(name);
-}
-
-interface ClassMetadata {
+export interface ClassMetadata {
     name: string,
     dependencies: Array<Bean>;
+    priority: number;
 }
 
-export function Component(name: string): ClassDecorator {
+interface ComponentOptions {
+    name?: string,
+    isInjectable?: boolean, 
+    isSingleton?: boolean
+}
+
+export function Service(options?: ComponentOptions): ClassDecorator {
     return <T extends Function>(target: T) => {
-        // const instance = Reflect.construct(target, []);
         const dependencies: Array<Bean> = Reflect.getMetadata(PARAMTYPES, target) || [];
-        if (dependencies.length) {
-            console.log(dependencies);
-        }
-        const beanMetadata: ClassMetadata = { name, dependencies };
+        const beanMetadata: ClassMetadata = { 
+            priority: dependencies.length, 
+            name: (options && options.name) || target.name,
+            dependencies 
+        };
+        Reflect.decorate([
+            Scope('singleton')
+        ], target);
         Reflect.defineMetadata(BEAN, beanMetadata, target);
         Reflect.defineMetadata(BEAN, beanMetadata, target.prototype);
-        Reflect.defineMetadata(CLASSTYPE, target, target);
-        // logMetaData(target);
-        // Container.registerBean(name, instance);
         return target;
     }
 }
 
-// function logMetaData<T extends Function>(target: T) {
-//     console.log("CREATING...", target.name);
-//     console.log("CREATING...", target);
-//     const param = 'design:paramtypes';
-//     const dependencies = Reflect.getMetadata(param, target);
-//     if (dependencies) {
-//         dependencies.forEach((elem: Function) => {
-//             console.log(elem.name);
-//             console.log(Reflect.getMetadata(BEAN, elem));
-//             const instance = Reflect.construct(elem, []);
-//             console.log(instance);
-//         });
-//     }
-//     console.log(Reflect.getMetadata(CLASSTYPE, target));
-//     console.log(Reflect.getMetadataKeys(target));
-//     console.log(Reflect.getOwnMetadataKeys(target));
-//     console.log(`${target.name} class: ${dependencies}, Metadat.[${param}]`);
-// }
+export function Component(options?: ComponentOptions): ClassDecorator {
+    return <T extends Function>(target: T) => {
+        const dependencies: Array<Bean> = Reflect.getMetadata(PARAMTYPES, target) || [];
+        const beanMetadata: ClassMetadata = { 
+            priority: dependencies.length, // this will flag container to create instance based on load weight
+            name: 'options.name', 
+            dependencies 
+        };
+        Reflect.decorate([
+            Scope('session')
+        ], target);
+        Reflect.defineMetadata(BEAN, beanMetadata, target);
+        Reflect.defineMetadata(BEAN, beanMetadata, target.prototype); 
+        return target;
+    }
+}
+

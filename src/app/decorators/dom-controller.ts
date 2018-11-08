@@ -32,10 +32,11 @@ export function DomController(options: ControllerOption): ClassDecorator {
                 + `it is highly recommended to implement "DomBindable" interface for controller class.`
             );
         }
-        Reflect.decorate([Component(options.name)], target);
+        Reflect.decorate([Component()], target);
         const instance = Reflect.construct(target, []);
         Reflect.hasMetadata(BEAN, instance);
         if (urlLocation === options.url) {
+            const bindControllers = instance.bindControllers;
             Reflect.defineProperty(target.prototype, BIND_CONTROLLERS, {
                 get(this) {
                     Reflect.defineProperty(this, BIND_CONTROLLERS, {
@@ -45,7 +46,7 @@ export function DomController(options: ControllerOption): ClassDecorator {
                             + `Modified @DomController mapping if this is a mistake.`
                         )
                     });
-                    return instance.bindControllers;
+                    return bindControllers;
                 }
             });
         } else {

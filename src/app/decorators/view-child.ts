@@ -21,7 +21,12 @@ export class NoViewChildException extends ReferenceError {
 // View child binding error should always be resolved
 export function ViewChild(selector: string, type: ViewElementRef = 'html'): PropertyDecorator {
     let viewComponent = viewSelector(selector);
-    return (target: object, propertyKey: string | symbol) => {
+    return <T extends HTMLElement, K extends JQuery<HTMLElement>>(target: object, propertyKey: string | symbol) => {
+        /* const metadataType = Reflect.getMetadata(DESIGNTYPE, target, propertyKey);
+        if (!is(metadataType, HTMLElement) || !is(metadataType, $())) {
+            console.warn("WRONG TYPE");
+        } */
+        Reflect.defineMetadata(DESIGNTYPE, HTMLElement, target);
         Reflect.defineProperty(target, propertyKey, {
             get() {
                 viewComponent = viewComponent || viewSelector(selector);
@@ -56,7 +61,10 @@ function is(a: Comparable, b: Comparable): boolean {
     if (Object.is(a, b)) {
         return true;
     }
-    if (JSON.stringify(a) === JSON.stringify(b)) {
+    const nameofa = (a as Function).name || (a as Function).prototype.name;
+    const nameofb = (b as Function).name || (b as Function).prototype.name;
+    if (nameofa.includes(nameofb)
+            || nameofb.includes(nameofa)) {
         return true;
     }
     return false;
